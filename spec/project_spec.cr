@@ -46,7 +46,8 @@ describe "Application" do
 
       tasks = repo.all
 
-      tasks.should eq([task2, task1])
+      tasks[0].name.should eq(task2.name)
+      tasks[1].name.should eq(task1.name)
     end
 
     it "Should not list done tasks" do

@@ -60,16 +60,19 @@ class TaskRepository < Repository
   end
 
   private def to_task(model : Model::Task) : Task
-    Task.new(name: model.name, creation_date: model.creation_date, done: model.done)
+    Task.new(id: model.id, name: model.name, creation_date: model.creation_date, done: model.done)
   end
 end
 
 class Task
-  setter id : Int32?
-  getter id : Int32?
+  setter id : Int64?
+  getter id : Int64?
 
   getter name : String
   getter creation_date : Time
+
+  def initialize(@id : Int64 | Nil, @name, @creation_date = ApplicationTime.get, @done = false)
+  end
 
   def initialize(@name, @creation_date = ApplicationTime.get, @done = false)
   end
@@ -80,6 +83,10 @@ class Task
 
   def done? : Bool
     @done
+  end
+
+  def ==(other)
+    self.id == other.id
   end
 
   def to_string(task_span_formatter : TaskSpanFormatter)
