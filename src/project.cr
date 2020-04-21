@@ -44,7 +44,7 @@ class TaskRepository < Repository
   end
 
   def active
-    default_scope.where(done: true).select.map { |model| to_task(model) }
+    default_scope.where(done: false).select.map { |model| to_task(model) }
   end
 
   def insert(task : Task)
