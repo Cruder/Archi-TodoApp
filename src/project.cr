@@ -35,31 +35,32 @@ abstract class Repository
 end
 
 class TaskRepository < Repository
-  @@tasks = [] of Task
-  @@id = 0
-
   def self.flush
-    @@tasks = [] of Task
-    @@id = 0
+    Model::Task.clear
   end
 
   def all
-    return @@tasks if @@tasks.size < 2
-    @@tasks.sort { |a, b| a.creation_date <=> b.creation_date }
+    default_scope.select.map { |model| to_task(model) }
   end
 
   def active
-    all.reject { |task| task.done? }
+    default_scope.where(done: true).select.map { |model| to_task(model) }
   end
 
-  def insert(task)
-    @@id += 1
-    task.id = @@id
-    @@tasks << task
+  def insert(task : Task)
+    Model::Task.create(name: task.name, creation_date: task.creation_date, done: task.done?)
   end
 
   def remove(id)
-    @@tasks.reject! { |task| task.id == id }
+    Model::Task.find(id).try(&.destroy)
+  end
+
+  private def default_scope
+    Model::Task.order(creation_date: :asc)
+  end
+
+  private def to_task(model : Model::Task) : Task
+    Task.new(name: model.name, creation_date: model.creation_date, done: model.done)
   end
 end
 
@@ -67,7 +68,7 @@ class Task
   setter id : Int32?
   getter id : Int32?
 
-  private getter name : String
+  getter name : String
   getter creation_date : Time
 
   def initialize(@name, @creation_date = ApplicationTime.get, @done = false)
