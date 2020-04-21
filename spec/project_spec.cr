@@ -7,31 +7,31 @@ describe "Application" do
     it "Shows correct duration for month" do
       task = Task.new("test", Time.utc(2010, 1, 1))
       ApplicationTime.set -> { Time.utc(2010, 3, 2) }
-      task.to_s.should eq("[2 month] test")
+      task.to_string(TaskSpanFormatter.new).should eq("[2 month] test")
     end
 
     it "Shows correct duration for day" do
       task = Task.new("test", Time.utc(2010, 1, 1))
       ApplicationTime.set -> { Time.utc(2010, 1, 3) }
-      task.to_s.should eq("[2d] test")
+      task.to_string(TaskSpanFormatter.new).should eq("[2d] test")
     end
 
     it "Shows correct duration for hours" do
       task = Task.new("test", Time.utc(2010, 1, 1, 1))
       ApplicationTime.set -> { Time.utc(2010, 1, 1, 5) }
-      task.to_s.should eq("[4h] test")
+      task.to_string(TaskSpanFormatter.new).should eq("[4h] test")
     end
 
     it "Shows correct duration for minutes" do
       task = Task.new("test", Time.utc(2010, 1, 1, 1, 1))
       ApplicationTime.set -> { Time.utc(2010, 1, 1, 1, 6) }
-      task.to_s.should eq("[5min] test")
+      task.to_string(TaskSpanFormatter.new).should eq("[5min] test")
     end
 
     it "Shows correct duration for minutes" do
       task = Task.new("test", Time.utc(2010, 1, 1, 1, 1, 0))
       ApplicationTime.set -> { Time.utc(2010, 1, 1, 1, 1, 25) }
-      task.to_s.should eq("[25s] test")
+      task.to_string(TaskSpanFormatter.new).should eq("[25s] test")
     end
   end
 
@@ -63,7 +63,7 @@ describe "Application" do
       task = Task.new("test")
 
       ApplicationTime.set -> { Time.utc(2010, 3, 3) }
-      task.to_s.should eq("[1d] test")
+      task.to_string(TaskSpanFormatter.new).should eq("[1d] test")
     end
   end
 
