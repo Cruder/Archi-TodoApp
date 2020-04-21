@@ -15,6 +15,13 @@ OptionParser.parse do |parser|
     task = Task.new(name)
     repo.insert(task)
   end
+  parser.on("-d ID", "--done=ID", "Mark a todo as done") do |id|
+    task = repo.find(id)
+    # task.try(&.complete)
+  end
+  parser.on("-r ID", "--remove=ID", "Remove a todo") do |id|
+    repo.remove(id)
+  end
   parser.on("-h", "--help", "Show this help") do
     puts parser
     exit
