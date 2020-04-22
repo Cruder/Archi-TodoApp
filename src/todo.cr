@@ -1,5 +1,6 @@
 require "option_parser"
-require "./project"
+require "./task_repository"
+require "./task_span_formatter"
 
 repo = TaskRepository.new
 
