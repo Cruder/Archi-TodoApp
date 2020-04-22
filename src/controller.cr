@@ -11,6 +11,8 @@ class Controller
   end
 
   def run(input_io = STDIN)
+    handle_update
+
     while open?
       handle_render
 
@@ -19,18 +21,6 @@ class Controller
 
       handle_update
     end
-  end
-
-  def handle_input(input : String)
-    @stack.last.on_input(input)
-  end
-
-  def handle_update
-    close! if empty?
-  end
-
-  def handle_render
-    @stack.last?.try { |activity| activity.on_render(@io) }
   end
 
   def push(id : String)
@@ -54,12 +44,24 @@ class Controller
     @factories[id] = block
   end
 
-  def close!
+  def open?
+    @open
+  end
+
+  private def close!
     @open = false
   end
 
-  def open?
-    @open
+  private def handle_input(input : String)
+    @stack.last.on_input(input)
+  end
+
+  private def handle_update
+    close! if empty?
+  end
+
+  private def handle_render
+    @stack.last?.try { |activity| activity.on_render(@io) }
   end
 end
 
@@ -171,4 +173,3 @@ class DoneTaskActivity < Activity
     end
   end
 end
-
