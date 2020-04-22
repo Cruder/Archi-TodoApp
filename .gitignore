@@ -5,3 +5,9 @@
 *.dwarf
 
 /db/db.sql
+
+config/.env.test
+
+config/.env
+
+db/db_test.sql

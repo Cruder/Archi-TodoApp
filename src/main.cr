@@ -1,6 +1,8 @@
 require "./controller"
 require "./activities/*"
+require "dotenv"
 
+Dotenv.load "config/.env"
 controller = Controller.new
 controller.register("main") { |ctrl| MainActivity.new(ctrl) }
 controller.register("list_tasks") { |ctrl| ListTasksActivity.new(ctrl) }

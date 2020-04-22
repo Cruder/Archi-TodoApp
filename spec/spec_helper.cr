@@ -1,4 +1,7 @@
 require "spec"
+require "dotenv"
+
+Dotenv.load "config/.env.test"
 
 require "../src/task_repository"
 require "../src/application_time"

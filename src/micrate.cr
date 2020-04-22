@@ -1,5 +1,7 @@
 require "micrate"
 require "sqlite3"
+require "dotenv"
 
-Micrate::DB.connection_url = "sqlite3://db/db.sql"
+Dotenv.load "config/.env"
+Micrate::DB.connection_url = ENV["DB_URL"] 
 Micrate::Cli.run
