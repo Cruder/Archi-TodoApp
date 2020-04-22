@@ -62,7 +62,6 @@ class Controller
   end
 end
 
-
 abstract class Activity
   def initialize(@controller : Controller)
   end
@@ -83,7 +82,6 @@ abstract class Activity
   end
 end
 
-
 class MainActivity < Activity
   @bad_input = false
 
@@ -100,14 +98,13 @@ class MainActivity < Activity
 
     case input
     when "q", "quit" then stack_pop
-    when "l" then stack_push("list_tasks")
-    when "r" then stack_push("remove_tasks")
+    when "l"         then stack_push("list_tasks")
+    when "r"         then stack_push("remove_tasks")
     else
       @bad_input = true
     end
   end
 end
-
 
 class RemoveTaskActivity < Activity
   def on_render(io : IO)
