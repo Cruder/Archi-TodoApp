@@ -11,6 +11,8 @@ class Controller
   end
 
   def run(input_io = STDIN)
+    handle_update
+
     while open?
       handle_render
 
@@ -19,18 +21,6 @@ class Controller
 
       handle_update
     end
-  end
-
-  def handle_input(input : String)
-    @stack.last.on_input(input)
-  end
-
-  def handle_update
-    close! if empty?
-  end
-
-  def handle_render
-    @stack.last?.try { |activity| activity.on_render(@io) }
   end
 
   def push(id : String)
@@ -54,12 +44,24 @@ class Controller
     @factories[id] = block
   end
 
-  def close!
+  def open?
+    @open
+  end
+
+  private def close!
     @open = false
   end
 
-  def open?
-    @open
+  private def handle_input(input : String)
+    @stack.last.on_input(input)
+  end
+
+  private def handle_update
+    close! if empty?
+  end
+
+  private def handle_render
+    @stack.last?.try { |activity| activity.on_render(@io) }
   end
 end
 
@@ -141,20 +143,4 @@ class TaskListActivity < Activity
       @bad_input = true
     end
   end
-end
-
-controller = Controller.new
-controller.register("main") { |ctrl| MainActivity.new(ctrl) }
-controller.register("list_tasks") { |ctrl| TaskListActivity.new(ctrl) }
-controller.register("remove_tasks") { |ctrl| RemoveTaskActivity.new(ctrl) }
-
-controller.push("main")
-
-while controller.open?
-  controller.handle_render
-
-  input = (gets || "").chomp
-  controller.handle_input(input)
-
-  controller.handle_update
 end
