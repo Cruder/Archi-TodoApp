@@ -18,10 +18,10 @@ class MainActivity < Activity
 
     case input
     when "q", "quit" then stack_pop
-    when "l" then stack_push("list_tasks")
-    when "a" then stack_push("add_task")
-    when "r" then stack_push("remove_task")
-    when "d" then stack_push("done_task")
+    when "l"         then stack_push("list_tasks")
+    when "a"         then stack_push("add_task")
+    when "r"         then stack_push("remove_task")
+    when "d"         then stack_push("done_task")
     else
       @bad_input = true
     end
