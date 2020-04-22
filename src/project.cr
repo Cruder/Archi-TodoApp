@@ -86,7 +86,7 @@ class Task
   end
 
   def ==(other)
-    self.id == other.id
+    self.id != nil && self.id == other.id
   end
 
   def to_string(task_span_formatter : TaskSpanFormatter)
