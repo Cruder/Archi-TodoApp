@@ -33,8 +33,8 @@ $ ./todo -a "My homework"
 - Display your todo list
 ```shell
 $ ./todo -l
-#4 - [12s] My homework
 #3 - [2d] Read a book
+#4 - [12s] My homework
 ```
 
 - Mark a todo as done. It won't appear anymore
