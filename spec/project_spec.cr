@@ -1,7 +1,4 @@
 require "./spec_helper"
-require "../src/task_repository"
-require "../src/application_time"
-require "../src/task_span_formatter"
 
 describe "Application" do
   after_each { TaskRepository.flush }

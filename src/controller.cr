@@ -9,6 +9,17 @@ class Controller
   def initialize(@io : IO = STDOUT)
   end
 
+  def run(input_io = STDIN)
+    while open?
+      handle_render
+
+      input = (input_io.gets || "").chomp
+      handle_input(input)
+
+      handle_update
+    end
+  end
+
   def handle_input(input : String)
     @stack.last.on_input(input)
   end
@@ -108,20 +119,4 @@ class RemoveTaskActivity < Activity
     repo.remove(input.to_i)
     stack_pop
   end
-end
-
-controller = Controller.new
-controller.register("main") { |ctrl| MainActivity.new(ctrl) }
-controller.register("list_tasks") { |ctrl| TaskListActivity.new(ctrl) }
-controller.register("remove_tasks") { |ctrl| RemoveTaskActivity.new(ctrl) }
-
-controller.push("main")
-
-while controller.open?
-  controller.handle_render
-
-  input = (gets || "").chomp
-  controller.handle_input(input)
-
-  controller.handle_update
 end
