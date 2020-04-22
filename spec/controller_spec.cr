@@ -41,6 +41,36 @@ describe MainActivity do
     end
 
     it "display error when bad input" do
+      output_catcher = IO::Memory.new
+      controller = Controller.new(output_catcher)
+      controller.register("main") { |ctrl| MainActivity.new(ctrl) }
+      controller.push("main")
+
+      fake_input = IO::Memory.new("foo\nq")
+      controller.run(fake_input)
+
+      controller.open?.should be_falsey
+      output_catcher.to_s.should eq(
+        <<-TXT
+        Menu -
+        l - List Tasks
+        a - Add Task
+        r - Remove Task
+        d - Mark task as done
+        q - Quit
+        \e[31m
+
+        Bad input
+
+        \e[0mMenu -
+        l - List Tasks
+        a - Add Task
+        r - Remove Task
+        d - Mark task as done
+        q - Quit
+
+        TXT
+      )
     end
   end
 end
