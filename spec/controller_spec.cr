@@ -16,7 +16,7 @@ describe Controller do
 end
 
 describe MainActivity do
-  context "can quit" do
+  context "when run" do
     it "quit when enter q" do
       output_catcher = IO::Memory.new
       controller = Controller.new(output_catcher)
@@ -31,10 +31,16 @@ describe MainActivity do
         <<-TXT
         Menu -
         l - List Tasks
+        a - Add Task
         r - Remove Task
+        d - Mark task as done
         q - Quit
+
         TXT
       )
+    end
+
+    it "display error when bad input" do
     end
   end
 end
