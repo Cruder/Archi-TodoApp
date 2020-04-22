@@ -1,5 +1,6 @@
 require "colorize"
 require "./task_repository"
+require "./task_span_formatter.cr"
 
 class Controller
   @factories = Hash(String, Proc(Controller, Activity)).new
@@ -109,6 +110,7 @@ class MainActivity < Activity
 end
 
 
+
 class RemoveTaskActivity < Activity
   def on_render(io : IO)
     io << "\nTask ID > "
@@ -119,4 +121,42 @@ class RemoveTaskActivity < Activity
     repo.remove(input.to_i)
     stack_pop
   end
+end
+
+class TaskListActivity < Activity
+  @bad_input = false
+  @repo = TaskRepository.new
+
+  def on_render(io : IO)
+    io << "\n\nBad input\n\n".colorize(:red) if @bad_input
+    tasks = @repo.active
+    tasks.each do |task|
+      io << task.to_string(TaskSpanFormatter.new)
+    end
+  end
+
+  def on_input(input : String)
+    @bad_input = false
+    case input
+    when "q", "quit" then stack_pop
+    else
+      @bad_input = true
+    end
+  end
+end
+
+controller = Controller.new
+controller.register("main") { |ctrl| MainActivity.new(ctrl) }
+controller.register("list_tasks") { |ctrl| TaskListActivity.new(ctrl) }
+controller.register("remove_tasks") { |ctrl| RemoveTaskActivity.new(ctrl) }
+
+controller.push("main")
+
+while controller.open?
+  controller.handle_render
+
+  input = (gets || "").chomp
+  controller.handle_input(input)
+
+  controller.handle_update
 end
