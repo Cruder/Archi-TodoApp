@@ -1,5 +1,6 @@
 require "granite"
 require "granite/adapter/sqlite"
+require "./application_time.cr"
 
 Granite::Connections << Granite::Adapter::Sqlite.new(name: "sqlite", url: "sqlite3://db/db.sql")
 
