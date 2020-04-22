@@ -1,5 +1,6 @@
 require "colorize"
 require "./task_repository"
+require "./task_span_formatter.cr"
 
 class Controller
   @factories = Hash(String, Proc(Controller, Activity)).new
@@ -9,16 +10,17 @@ class Controller
   def initialize(@io : IO = STDOUT)
   end
 
-  def handle_input(input : String)
-    @stack.last.on_input(input)
-  end
+  def run(input_io = STDIN)
+    handle_update
 
-  def handle_update
-    close! if empty?
-  end
+    while open?
+      handle_render
 
-  def handle_render
-    @stack.last?.try { |activity| activity.on_render(@io) }
+      input = (input_io.gets || "").chomp
+      handle_input(input)
+
+      handle_update
+    end
   end
 
   def push(id : String)
@@ -42,15 +44,26 @@ class Controller
     @factories[id] = block
   end
 
-  def close!
-    @open = false
-  end
-
   def open?
     @open
   end
-end
 
+  private def close!
+    @open = false
+  end
+
+  private def handle_input(input : String)
+    @stack.last.on_input(input)
+  end
+
+  private def handle_update
+    close! if empty?
+  end
+
+  private def handle_render
+    @stack.last?.try { |activity| activity.on_render(@io) }
+  end
+end
 
 abstract class Activity
   def initialize(@controller : Controller)
@@ -72,7 +85,6 @@ abstract class Activity
   end
 end
 
-
 class MainActivity < Activity
   @bad_input = false
 
@@ -82,6 +94,7 @@ class MainActivity < Activity
     io << "l - List Tasks\n"
     io << "a - Add Task\n"
     io << "r - Remove Task\n"
+    io << "d - Mark task as done\n"
     io << "q - Quit\n"
   end
 
@@ -93,22 +106,30 @@ class MainActivity < Activity
     when "l" then stack_push("list_tasks")
     when "a" then stack_push("add_task")
     when "r" then stack_push("remove_task")
+    when "d" then stack_push("done_tasks")
     else
       @bad_input = true
     end
   end
 end
 
-
 class RemoveTaskActivity < Activity
+  @bad_input = false
+
   def on_render(io : IO)
+    io << "\n\nBad input\n\n".colorize(:red) if @bad_input
     io << "\nTask ID > "
   end
 
   def on_input(input : String)
+    @bad_input = false
     repo = TaskRepository.new
-    repo.remove(input.to_i)
-    stack_pop
+    begin
+      repo.remove(input.to_i)
+      stack_pop
+    rescue ArgumentError
+      @bad_input = true
+    end
   end
 end
 
@@ -125,19 +146,44 @@ class AddTaskActivity < Activity
   end
 end
 
-controller = Controller.new
-controller.register("main") { |ctrl| MainActivity.new(ctrl) }
-controller.register("list_tasks") { |ctrl| TaskListActivity.new(ctrl) }
-controller.register("remove_task") { |ctrl| RemoveTaskActivity.new(ctrl) }
-controller.register("add_task") { |ctrl| AddTaskActivity.new(ctrl) }
+class TaskListActivity < Activity
+  @bad_input = false
+  @repo = TaskRepository.new
 
-controller.push("main")
+  def on_render(io : IO)
+    io << "\n\nBad input\n\n".colorize(:red) if @bad_input
+    tasks = @repo.active
+    tasks.each do |task|
+      io << task.to_string(TaskSpanFormatter.new)
+    end
+  end
 
-while controller.open?
-  controller.handle_render
+  def on_input(input : String)
+    @bad_input = false
+    case input
+    when "q", "quit" then stack_pop
+    else
+      @bad_input = true
+    end
+  end
+end
 
-  input = (gets || "").chomp
-  controller.handle_input(input)
+class DoneTaskActivity < Activity
+  @bad_input = false
 
-  controller.handle_update
+  def on_render(io : IO)
+    io << "\n\nBad input\n\n".colorize(:red) if @bad_input
+    io << "\nTask ID > "
+  end
+
+  def on_input(input : String)
+    @bad_input = false
+    repo = TaskRepository.new
+    begin
+      repo.complete(input.to_i)
+      stack_pop
+    rescue ArgumentError
+      @bad_input = true
+    end
+  end
 end

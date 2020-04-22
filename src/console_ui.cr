@@ -18,7 +18,7 @@ class Console::Output < IOutput
 end
 
 class Console::Input
-  @@catch = -> { gets }
+  @@catch = ->{ gets }
 
   def self.set(new_catch : Proc(String?))
     @@catch = new_catch
@@ -33,7 +33,5 @@ output = Console::Output.new
 
 output.send("Enter something")
 smth = Console::Input.read
-
-
 
 output.send("Your typed: #{smth}")
