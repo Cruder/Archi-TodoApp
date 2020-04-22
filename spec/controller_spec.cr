@@ -14,3 +14,27 @@ describe Controller do
     end
   end
 end
+
+describe MainActivity do
+  context "can quit" do
+    it "quit when enter q" do
+      output_catcher = IO::Memory.new
+      controller = Controller.new(output_catcher)
+      controller.register("main") { |ctrl| MainActivity.new(ctrl) }
+      controller.push("main")
+
+      fake_input = IO::Memory.new("q")
+      controller.run(fake_input)
+
+      controller.open?.should be_falsey
+      output_catcher.to_s.should eq(
+        <<-TXT
+        Menu -
+        l - List Tasks
+        r - Remove Task
+        q - Quit
+        TXT
+      )
+    end
+  end
+end
