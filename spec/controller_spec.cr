@@ -74,3 +74,47 @@ describe MainActivity do
     end
   end
 end
+
+describe DoneTaskActivity do
+  after_each { TaskRepository.flush }
+  
+  context "can mark task as done" do
+    it "should mark task as done when entering task id" do
+      repo = TaskRepository.new
+      repo.insert(Task.new("test task"))
+      task = repo.all.last
+      Logger.new(STDOUT).info("id : #{task.id}")
+      output_catcher = IO::Memory.new
+      controller = Controller.new(output_catcher)
+      controller.register("main") { |ctrl| MainActivity.new(ctrl) }
+      controller.register("done_task") { |ctrl| DoneTaskActivity.new(ctrl) }
+      controller.push("main")
+
+      fake_input = IO::Memory.new("d\n#{task.id}\nq")
+      controller.run(fake_input)
+
+      output_catcher.to_s.should eq(
+        <<-TXT
+        Menu -
+        l - List Tasks
+        a - Add Task
+        r - Remove Task
+        d - Mark task as done
+        q - Quit
+        
+        Task ID > Menu -
+        l - List Tasks
+        a - Add Task
+        r - Remove Task
+        d - Mark task as done
+        q - Quit
+
+        TXT
+      )
+
+      task = repo.all.last
+      task.done?.should eq(true)
+    end
+  end
+end
+
