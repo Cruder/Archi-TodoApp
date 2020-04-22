@@ -58,7 +58,7 @@ abstract class Activity
   abstract def on_render(io : IO)
   abstract def on_input(input : String)
 
-  protected def stack_push(id : Symbol)
+  protected def stack_push(id : String)
     @controller.push(id)
   end
 
@@ -78,14 +78,16 @@ class MainActivity < Activity
   def on_render(io : IO)
     io << "\n\nBad input\n\n".colorize(:red) if @bad_input
     io << "Menu -\n"
-    io << ""
+    io << "l - List Tasks"
+    io << "q - Quit\n"
   end
 
   def on_input(input : String)
     @bad_input = false
 
     case input
-    when "q", "quit" then stack_clear
+    when "q", "quit" then stack_pop
+    when "l" then stack_push("list_tasks")
     else
       @bad_input = true
     end
@@ -94,6 +96,7 @@ end
 
 controller = Controller.new
 controller.register("main") { |ctrl| MainActivity.new(ctrl) }
+controller.register("list_tasks") { |ctrl| TaskListActivity.new(ctrl) }
 
 controller.push("main")
 
