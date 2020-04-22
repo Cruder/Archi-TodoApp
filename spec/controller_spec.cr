@@ -9,7 +9,7 @@ describe Controller do
 
     it "is close when no activity run after update" do
       controller = Controller.new
-      controller.run()
+      controller.run
       controller.open?.should be_falsey
     end
   end
