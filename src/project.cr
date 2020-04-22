@@ -55,6 +55,14 @@ class TaskRepository < Repository
     Model::Task.find(id).try(&.destroy)
   end
 
+  def complete(id)
+    Model::Task.find(id).try(&.update(done: true))
+  end
+
+  def find(id)
+    Model::Task.find(id)
+  end
+
   private def default_scope
     Model::Task.order(creation_date: :asc)
   end
@@ -77,10 +85,6 @@ class Task
   def initialize(@name, @creation_date = ApplicationTime.get, @done = false)
   end
 
-  def complete
-    @done = true
-  end
-
   def done? : Bool
     @done
   end
@@ -90,7 +94,7 @@ class Task
   end
 
   def to_string(task_span_formatter : TaskSpanFormatter)
-    "[#{task_span_formatter.format(existance_time)}] #{name}"
+    "##{id} - [#{task_span_formatter.format(existance_time)}] #{name}"
   end
 
   def existance_time : Time::Span
