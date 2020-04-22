@@ -39,8 +39,6 @@ describe MainActivity do
         TXT
       )
     end
-
-    it "display error when bad input" do
-    end
   end
 end
+
