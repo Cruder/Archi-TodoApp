@@ -154,7 +154,7 @@ class TaskListActivity < Activity
     io << "\n\nBad input\n\n".colorize(:red) if @bad_input
     tasks = @repo.active
     tasks.each do |task|
-      io << task.to_string(TaskSpanFormatter.new)
+      io << task.to_string(TaskSpanFormatter.new) + "\n"
     end
   end
 
