@@ -156,15 +156,11 @@ class TaskListActivity < Activity
     tasks.each do |task|
       io << task.to_string(TaskSpanFormatter.new) + "\n"
     end
+    io << "\nPress [ENTER] to continue\n\n"
   end
 
   def on_input(input : String)
-    @bad_input = false
-    case input
-    when "q", "quit" then stack_pop
-    else
-      @bad_input = true
-    end
+    stack_pop
   end
 end
 
