@@ -1,4 +1,5 @@
 require "colorize"
+require "./task_repository"
 
 class Controller
   @factories = Hash(String, Proc(Controller, Activity)).new
@@ -78,7 +79,8 @@ class MainActivity < Activity
   def on_render(io : IO)
     io << "\n\nBad input\n\n".colorize(:red) if @bad_input
     io << "Menu -\n"
-    io << "l - List Tasks"
+    io << "l - List Tasks\n"
+    io << "r - Remove Task\n"
     io << "q - Quit\n"
   end
 
@@ -88,15 +90,30 @@ class MainActivity < Activity
     case input
     when "q", "quit" then stack_pop
     when "l" then stack_push("list_tasks")
+    when "r" then stack_push("remove_tasks")
     else
       @bad_input = true
     end
   end
 end
 
+
+class RemoveTaskActivity < Activity
+  def on_render(io : IO)
+    io << "\nTask ID > "
+  end
+
+  def on_input(input : String)
+    repo = TaskRepository.new
+    repo.remove(input.to_i)
+    stack_pop
+  end
+end
+
 controller = Controller.new
 controller.register("main") { |ctrl| MainActivity.new(ctrl) }
 controller.register("list_tasks") { |ctrl| TaskListActivity.new(ctrl) }
+controller.register("remove_tasks") { |ctrl| RemoveTaskActivity.new(ctrl) }
 
 controller.push("main")
 
