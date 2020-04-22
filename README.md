@@ -20,7 +20,7 @@ crystal build src/todo.cr
 
 - Execute
 ```shell
-$ ./todo
+$ ./todo -i
 ```
 You'll enter an interractive mode and be guided to manage your todo list.
 

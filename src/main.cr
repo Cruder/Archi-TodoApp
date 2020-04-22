@@ -1,12 +1,13 @@
 require "option_parser"
 require "dotenv"
 
+Dotenv.load "config/.env"
+
 require "./controller"
 require "./activities/*"
 require "./task_repository"
 require "./task_span_formatter"
 
-Dotenv.load "config/.env"
 
 repo = TaskRepository.new
 
