@@ -39,6 +39,22 @@ describe MainActivity do
         TXT
       )
     end
+
+    it "display error when bad input" do
+      output_catcher = IO::Memory.new
+      controller = Controller.new(output_catcher)
+      controller.register("main") { |ctrl| MainActivity.new(ctrl) }
+      controller.push("main")
+
+      fake_input = IO::Memory.new("x")
+      controller.run(fake_input)
+
+      output_catcher.to_s.should eq(
+        <<-TXT
+        this is a test
+        TXT
+      )
+    end
   end
 end
 
