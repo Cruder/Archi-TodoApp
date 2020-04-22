@@ -61,7 +61,7 @@ describe "Application" do
   context "Create a Task" do
     it "Should create a task" do
       ApplicationTime.set -> { Time.utc(2010, 3, 2) }
-      task = Task.new(id: 1, "test")
+      task = Task.new(id: 1, name: "test")
 
       ApplicationTime.set -> { Time.utc(2010, 3, 3) }
       task.to_string(TaskSpanFormatter.new).should eq("#1 - [1d] test")
@@ -80,12 +80,15 @@ describe "Application" do
   end
 
   context "Done a Task" do
-    task = Task.new("test")
+    repo = TaskRepository.new
+    repo.insert(Task.new("test"))
 
+    task = repo.all.first
     task.done?.should be_falsey
 
-    task.complete
+    repo.complete(task.id)
 
+    task = repo.all.first
     task.done?.should be_truthy
   end
 end
