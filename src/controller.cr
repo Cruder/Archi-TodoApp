@@ -9,6 +9,17 @@ class Controller
   def initialize(@io : IO = STDOUT)
   end
 
+  def run(input_io = STDIN)
+    while open?
+      handle_render
+
+      input = (input_io.gets || "").chomp
+      handle_input(input)
+
+      handle_update
+    end
+  end
+
   def handle_input(input : String)
     @stack.last.on_input(input)
   end
@@ -51,7 +62,6 @@ class Controller
   end
 end
 
-
 abstract class Activity
   def initialize(@controller : Controller)
   end
@@ -71,7 +81,6 @@ abstract class Activity
     @controller.clear
   end
 end
-
 
 class MainActivity < Activity
   @bad_input = false
@@ -98,7 +107,6 @@ class MainActivity < Activity
     end
   end
 end
-
 
 class RemoveTaskActivity < Activity
   @bad_input = false
@@ -138,21 +146,4 @@ class DoneTaskActivity < Activity
       @bad_input = true
     end
   end
-end
-
-controller = Controller.new
-controller.register("main") { |ctrl| MainActivity.new(ctrl) }
-#controller.register("list_tasks") { |ctrl| TaskListActivity.new(ctrl) }
-controller.register("remove_tasks") { |ctrl| RemoveTaskActivity.new(ctrl) }
-controller.register("done_tasks") { |ctrl| DoneTaskActivity.new(ctrl) }
-
-controller.push("main")
-
-while controller.open?
-  controller.handle_render
-
-  input = (gets || "").chomp
-  controller.handle_input(input)
-
-  controller.handle_update
 end

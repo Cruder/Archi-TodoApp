@@ -6,7 +6,7 @@ authors:
 
 targets:
   project:
-    main: src/project.cr
+    main: src/main.cr
   micrate:
     main: src/micrate.cr
 

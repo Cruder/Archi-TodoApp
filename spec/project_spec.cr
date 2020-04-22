@@ -1,7 +1,4 @@
 require "./spec_helper"
-require "../src/task_repository"
-require "../src/application_time"
-require "../src/task_span_formatter"
 
 describe "Application" do
   after_each { TaskRepository.flush }
@@ -9,31 +6,31 @@ describe "Application" do
   context "Display a task" do
     it "Shows correct duration for month" do
       task = Task.new(1, "test", Time.utc(2010, 1, 1), false)
-      ApplicationTime.set -> { Time.utc(2010, 3, 2) }
+      ApplicationTime.set ->{ Time.utc(2010, 3, 2) }
       task.to_string(TaskSpanFormatter.new).should eq("#1 - [2 month] test")
     end
 
     it "Shows correct duration for day" do
       task = Task.new(1, "test", Time.utc(2010, 1, 1), false)
-      ApplicationTime.set -> { Time.utc(2010, 1, 3) }
+      ApplicationTime.set ->{ Time.utc(2010, 1, 3) }
       task.to_string(TaskSpanFormatter.new).should eq("#1 - [2d] test")
     end
 
     it "Shows correct duration for hours" do
       task = Task.new(1, "test", Time.utc(2010, 1, 1, 1), false)
-      ApplicationTime.set -> { Time.utc(2010, 1, 1, 5) }
+      ApplicationTime.set ->{ Time.utc(2010, 1, 1, 5) }
       task.to_string(TaskSpanFormatter.new).should eq("#1 - [4h] test")
     end
 
     it "Shows correct duration for minutes" do
       task = Task.new(1, "test", Time.utc(2010, 1, 1, 1, 1), false)
-      ApplicationTime.set -> { Time.utc(2010, 1, 1, 1, 6) }
+      ApplicationTime.set ->{ Time.utc(2010, 1, 1, 1, 6) }
       task.to_string(TaskSpanFormatter.new).should eq("#1 - [5min] test")
     end
 
     it "Shows correct duration for minutes" do
       task = Task.new(1, "test", Time.utc(2010, 1, 1, 1, 1, 0), false)
-      ApplicationTime.set -> { Time.utc(2010, 1, 1, 1, 1, 25) }
+      ApplicationTime.set ->{ Time.utc(2010, 1, 1, 1, 1, 25) }
       task.to_string(TaskSpanFormatter.new).should eq("#1 - [25s] test")
     end
   end
@@ -63,10 +60,10 @@ describe "Application" do
 
   context "Create a Task" do
     it "Should create a task" do
-      ApplicationTime.set -> { Time.utc(2010, 3, 2) }
+      ApplicationTime.set ->{ Time.utc(2010, 3, 2) }
       task = Task.new(id: 1, name: "test")
 
-      ApplicationTime.set -> { Time.utc(2010, 3, 3) }
+      ApplicationTime.set ->{ Time.utc(2010, 3, 3) }
       task.to_string(TaskSpanFormatter.new).should eq("#1 - [1d] test")
     end
   end
