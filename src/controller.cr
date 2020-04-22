@@ -1,6 +1,7 @@
 require "colorize"
 require "./task_repository"
 require "./task_span_formatter.cr"
+require "./activity"
 
 class Controller
   @factories = Hash(String, Proc(Controller, Activity)).new
@@ -62,124 +63,5 @@ class Controller
 
   private def handle_render
     @stack.last?.try { |activity| activity.on_render(@io) }
-  end
-end
-
-abstract class Activity
-  def initialize(@controller : Controller)
-  end
-
-  abstract def on_render(io : IO)
-  abstract def on_input(input : String)
-
-  protected def stack_push(id : String)
-    @controller.push(id)
-  end
-
-  protected def stack_pop
-    @controller.pop
-  end
-
-  protected def stack_clear
-    @controller.clear
-  end
-end
-
-class MainActivity < Activity
-  @bad_input = false
-
-  def on_render(io : IO)
-    io << "\n\nBad input\n\n".colorize(:red) if @bad_input
-    io << "Menu -\n"
-    io << "l - List Tasks\n"
-    io << "a - Add Task\n"
-    io << "r - Remove Task\n"
-    io << "d - Mark task as done\n"
-    io << "q - Quit\n"
-  end
-
-  def on_input(input : String)
-    @bad_input = false
-
-    case input
-    when "q", "quit" then stack_pop
-    when "l" then stack_push("list_tasks")
-    when "a" then stack_push("add_task")
-    when "r" then stack_push("remove_task")
-    when "d" then stack_push("done_tasks")
-    else
-      @bad_input = true
-    end
-  end
-end
-
-class RemoveTaskActivity < Activity
-  @bad_input = false
-
-  def on_render(io : IO)
-    io << "\n\nBad input\n\n".colorize(:red) if @bad_input
-    io << "\nTask ID > "
-  end
-
-  def on_input(input : String)
-    @bad_input = false
-    repo = TaskRepository.new
-    begin
-      repo.remove(input.to_i)
-      stack_pop
-    rescue ArgumentError
-      @bad_input = true
-    end
-  end
-end
-
-class AddTaskActivity < Activity
-  def on_render(io : IO)
-    io << "\nName your task > "
-  end
-
-  def on_input(input : String)
-    repo = TaskRepository.new
-    task = Task.new(input)
-    repo.insert(task)
-    stack_pop
-  end
-end
-
-class TaskListActivity < Activity
-  @bad_input = false
-  @repo = TaskRepository.new
-
-  def on_render(io : IO)
-    io << "\n\nBad input\n\n".colorize(:red) if @bad_input
-    tasks = @repo.active
-    tasks.each do |task|
-      io << task.to_string(TaskSpanFormatter.new) + "\n"
-    end
-    io << "\nPress [ENTER] to continue\n\n"
-  end
-
-  def on_input(input : String)
-    stack_pop
-  end
-end
-
-class DoneTaskActivity < Activity
-  @bad_input = false
-
-  def on_render(io : IO)
-    io << "\n\nBad input\n\n".colorize(:red) if @bad_input
-    io << "\nTask ID > "
-  end
-
-  def on_input(input : String)
-    @bad_input = false
-    repo = TaskRepository.new
-    begin
-      repo.complete(input.to_i)
-      stack_pop
-    rescue ArgumentError
-      @bad_input = true
-    end
   end
 end
