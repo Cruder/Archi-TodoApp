@@ -1,7 +1,5 @@
 abstract class Repository
     abstract def all
-    abstract def self.flush
-    abstract def all
     abstract def active
     abstract def insert(task : Task)
     abstract def remove(id)
